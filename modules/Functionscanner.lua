@@ -3,7 +3,7 @@ local luatypeenc = import("modules/luatypeencode.lua")
 local contextmenu = import("ui/controls/Contextmenu.lua")
 getfunctionbytecode = getfunctionbytecode or
 function(func)
-    return getscriptebytecode(debug.getinfo(func).source)
+    return getscriptbytecode(debug.getinfo(func).source)
 end
 local function searchfunctions(query, mode, funcframe)
 if mode == "Name" then
