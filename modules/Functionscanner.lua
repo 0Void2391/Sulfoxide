@@ -20,6 +20,10 @@ if mode == "Name" then
             local contextmenudata = {
                 {
                     ["Text"] = "Decompile",
+                    ["Func"] = function() toclipboard(decompile(v)) end
+                },
+                  {
+                    ["Text"] = "Decompile Script",
                     ["Func"] = function() toclipboard(decompile(debug.getinfo(v).source)) end
                 },
                 {
@@ -94,8 +98,12 @@ elseif mode == "Path" then
             newfuncframe.Upvalues.Text = tostring(#debug.getupvalues(v))
 
             local contextmenudata = {
-                  {
+                {
                     ["Text"] = "Decompile",
+                    ["Func"] = function() toclipboard(decompile(v)) end
+                },
+                  {
+                    ["Text"] = "Decompile Script",
                     ["Func"] = function() toclipboard(decompile(debug.getinfo(v).source)) end
                 },
                 {
@@ -150,7 +158,7 @@ toclipboard(str:format(luatypeenc(getfenv(v).script), '"'..name..'"', "constants
                             end
                 },
                 {
-                    ["Text"] = "Save bytecode",
+                    ["Text"] = "Save Bytecode",
                     ["Func"] = function() writefile((debug.getinfo(v).name or "Unnamed function")..".bin", select(2,pcall(getfunctionbytecode, v))) end
                 }
             }
