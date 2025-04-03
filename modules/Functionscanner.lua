@@ -24,7 +24,7 @@ if mode == "Name" then
                 },
                   {
                     ["Text"] = "Decompile Script",
-                    ["Func"] = function() toclipboard(decompile(debug.getinfo(v).source)) end
+                    ["Func"] = function() toclipboard(decompile(getfenv(v).script)) end
                 },
                 {
                     ["Text"] = "Get script",
