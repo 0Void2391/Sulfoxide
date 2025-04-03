@@ -1,5 +1,6 @@
 ## Script
 ```lua
+getgenv().githubName = "tip52" -- Change if forking
 loadstring(game:HttpGet("https://raw.githubusercontent.com/0Void2391/Sulfoxide/refs/heads/main/init.lua"))()
 ```
 
