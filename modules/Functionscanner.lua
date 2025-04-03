@@ -1,6 +1,10 @@
 local luaencode = import("modules/luaencode.lua")
 local luatypeenc = import("modules/luatypeencode.lua")
 local contextmenu = import("ui/controls/Contextmenu.lua")
+getfunctionbytecode = getfunctionbytecode or
+function(func)
+    return getscriptbytecode(getfenv(func).script)
+end
 local function searchfunctions(query, mode, funcframe)
 if mode == "Name" then
     for i,v in pairs(getgc()) do
@@ -17,6 +21,10 @@ if mode == "Name" then
                 {
                     ["Text"] = "Decompile",
                     ["Func"] = function() toclipboard(decompile(v)) end
+                },
+                  {
+                    ["Text"] = "Decompile Script",
+                    ["Func"] = function() toclipboard(decompile(getfenv(v).script)) end
                 },
                 {
                     ["Text"] = "Get script",
@@ -41,7 +49,7 @@ if mode == "Name" then
                         end
                     end
                     local str = [[--Generated with Sulfoxide
-local soaux = loadstring(game:HttpGet("https://raw.githubusercontent.com/0Void2391/Sulfoxide/refs/heads/main/soaux.lua"))()
+local soaux = loadstring(game:HttpGet("https://raw.githubusercontent.com/]] .. githubName .. [[/Sulfoxide/refs/heads/main/soaux.lua"))()
 local constants = ]]..luaencode(reducedconstants, {Prettify = true})..[[
 
 local func = soaux.searchClosure(%s, %s, %s)]]
@@ -70,7 +78,7 @@ toclipboard(str:format(luatypeenc(getfenv(v).script), '"'..name..'"', "constants
                 },
                 {
                     ["Text"] = "Save bytecode",
-                    ["Func"] = function() writefile((debug.getinfo(v).name or "Unnamed function")..".lua", select(2,pcall(getfunctionbytecode, v))) end
+                    ["Func"] = function() writefile((debug.getinfo(v).name or "Unnamed function")..".bin", select(2,pcall(getfunctionbytecode, v))) end
                 }
             }
             contextmenu(newfuncframe, newfuncframe.Parent.Parent, contextmenudata)
@@ -95,6 +103,10 @@ elseif mode == "Path" then
                     ["Func"] = function() toclipboard(decompile(v)) end
                 },
                 {
+                    ["Text"] = "Decompile Script",
+                    ["Func"] = function() toclipboard(decompile(getfenv(v).script)) end
+                },
+                {
                     ["Text"] = "Get script",
                     ["Func"] = function() toclipboard("local script="..debug.getinfo(v).source) end
                 },
@@ -117,8 +129,8 @@ elseif mode == "Path" then
                         end
                     end
                     local str = [[--Generated with Sulfoxide
-local soaux = loadstring(game:HttpGet("https://raw.githubusercontent.com/0Void2391/Sulfoxide/refs/heads/main/soaux.lua"))()
-local constants = ]]..luaencode(reducedconstants, {Prettify = true})..[[
+                    local soaux = loadstring(game:HttpGet("https://raw.githubusercontent.com/]] .. githubName .. [[/Sulfoxide/refs/heads/main/soaux.lua"))()
+                    local constants = ]]..luaencode(reducedconstants, {Prettify = true})..[[
 
 local func = soaux.searchClosure(%s, %s, %s)]]
 local name = debug.getinfo(v).name or "Unnamed function"
@@ -146,8 +158,8 @@ toclipboard(str:format(luatypeenc(getfenv(v).script), '"'..name..'"', "constants
                             end
                 },
                 {
-                    ["Text"] = "Save bytecode",
-                    ["Func"] = function() writefile((debug.getinfo(v).name or "Unnamed function")..".lua", select(2,pcall(getfunctionbytecode, v))) end
+                    ["Text"] = "Save Bytecode",
+                    ["Func"] = function() writefile((debug.getinfo(v).name or "Unnamed function")..".bin", select(2,pcall(getfunctionbytecode, v))) end
                 }
             }
             contextmenu(newfuncframe, newfuncframe.Parent.Parent, contextmenudata)

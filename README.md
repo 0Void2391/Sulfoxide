@@ -1,6 +1,7 @@
 ## Script
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/0Void2391/Sulfoxide/refs/heads/main/init.lua"))()
+getgenv().githubName = "tip52" -- Change if forking
+loadstring(game:HttpGet("https://raw.githubusercontent.com/" .. githubName .. "/Sulfoxide/refs/heads/main/init.lua"))()
 ```
 
 # Sulfoxide
@@ -20,8 +21,10 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/0Void2391/Sulfoxide/r
 * Function scanner
     * Filter functions by name and path
     * Generate code
-    * Save bytecode (only in synz rewrite for now)
-    * Decompile (only in synz)
+    * Save Function bytecode (only in synz rewrite for now)
+    * Save Script Bytecode
+    * Decompile Function (only in synz)
+    * Decompile Script
     * Get upvalues
     * Get constants
     * Get protos

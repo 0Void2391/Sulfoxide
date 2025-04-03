@@ -1,7 +1,7 @@
 if getgenv().ui then warn("already executed!") return end
 getgenv().import = function(module)
     if getgenv().settings.runmode == "web" then
-        return loadstring(game:HttpGet("https://raw.githubusercontent.com/0Void2391/Sulfoxide/refs/heads/main/"..module))()
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/" .. githubName .. "/Sulfoxide/refs/heads/main/"..module))()
     elseif getgenv().settings.runmode == "file" then
         return loadstring(readfile("Sulfoxide/"..module))()
     end
