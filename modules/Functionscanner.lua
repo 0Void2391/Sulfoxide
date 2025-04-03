@@ -1,6 +1,10 @@
 local luaencode = import("modules/luaencode.lua")
 local luatypeenc = import("modules/luatypeencode.lua")
 local contextmenu = import("ui/controls/Contextmenu.lua")
+getfunctionbytecode = getfunctionbytecode or
+function(func)
+    return getscriptebytecode(debug.getinfo(func).source)
+end
 local function searchfunctions(query, mode, funcframe)
 if mode == "Name" then
     for i,v in pairs(getgc()) do
@@ -16,7 +20,7 @@ if mode == "Name" then
             local contextmenudata = {
                 {
                     ["Text"] = "Decompile",
-                    ["Func"] = function() toclipboard(decompile(v)) end
+                    ["Func"] = function() toclipboard(decompile(debug.getinfo(v).source)) end
                 },
                 {
                     ["Text"] = "Get script",
@@ -70,7 +74,7 @@ toclipboard(str:format(luatypeenc(getfenv(v).script), '"'..name..'"', "constants
                 },
                 {
                     ["Text"] = "Save bytecode",
-                    ["Func"] = function() writefile((debug.getinfo(v).name or "Unnamed function")..".lua", select(2,pcall(getfunctionbytecode, v))) end
+                    ["Func"] = function() writefile((debug.getinfo(v).name or "Unnamed function")..".bin", select(2,pcall(getfunctionbytecode, v))) end
                 }
             }
             contextmenu(newfuncframe, newfuncframe.Parent.Parent, contextmenudata)
@@ -90,9 +94,9 @@ elseif mode == "Path" then
             newfuncframe.Upvalues.Text = tostring(#debug.getupvalues(v))
 
             local contextmenudata = {
-                {
+                  {
                     ["Text"] = "Decompile",
-                    ["Func"] = function() toclipboard(decompile(v)) end
+                    ["Func"] = function() toclipboard(decompile(debug.getinfo(v).source)) end
                 },
                 {
                     ["Text"] = "Get script",
@@ -147,7 +151,7 @@ toclipboard(str:format(luatypeenc(getfenv(v).script), '"'..name..'"', "constants
                 },
                 {
                     ["Text"] = "Save bytecode",
-                    ["Func"] = function() writefile((debug.getinfo(v).name or "Unnamed function")..".lua", select(2,pcall(getfunctionbytecode, v))) end
+                    ["Func"] = function() writefile((debug.getinfo(v).name or "Unnamed function")..".bin", select(2,pcall(getfunctionbytecode, v))) end
                 }
             }
             contextmenu(newfuncframe, newfuncframe.Parent.Parent, contextmenudata)
