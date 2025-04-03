@@ -3,7 +3,7 @@ local luatypeenc = import("modules/luatypeencode.lua")
 local contextmenu = import("ui/controls/Contextmenu.lua")
 getfunctionbytecode = getfunctionbytecode or
 function(func)
-    return getscriptbytecode(debug.getinfo(func).source)
+    return getscriptbytecode(getfenv(func).script)
 end
 local function searchfunctions(query, mode, funcframe)
 if mode == "Name" then
@@ -102,9 +102,9 @@ elseif mode == "Path" then
                     ["Text"] = "Decompile",
                     ["Func"] = function() toclipboard(decompile(v)) end
                 },
-                  {
+                {
                     ["Text"] = "Decompile Script",
-                    ["Func"] = function() toclipboard(decompile(debug.getinfo(v).source)) end
+                    ["Func"] = function() toclipboard(decompile(getfenv(v).script)) end
                 },
                 {
                     ["Text"] = "Get script",
