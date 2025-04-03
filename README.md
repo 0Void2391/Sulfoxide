@@ -21,8 +21,10 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/0Void2391/Sulfoxide/r
 * Function scanner
     * Filter functions by name and path
     * Generate code
-    * Save bytecode (only in synz rewrite for now)
-    * Decompile (only in synz)
+    * Save Function bytecode (only in synz rewrite for now)
+    * Save Script Bytecode
+    * Decompile Function (only in synz)
+    * Decompile Script
     * Get upvalues
     * Get constants
     * Get protos
