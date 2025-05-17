@@ -2229,7 +2229,7 @@ end
 
 G2L_MODULES[G2L["3b"]] = {
 Closure = function()
-    local script = G2L["3b"];local textService = game.GetService(game,"TextService");
+    local script = G2L["3b"];local textService = cloneref and cloneref(game.GetService(game,"TextService")) or game.GetService(game,"TextService");
 
 -- ui
 local scrolling = script.Parent.ScrollingFrame;
