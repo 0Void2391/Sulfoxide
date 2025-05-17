@@ -1,4 +1,4 @@
-local uip = game:GetService("UserInputService")
+local uip = cloneref and cloneref(game:GetService("UserInputService")) or game:GetService("UserInputService")
 local baseframe = ui.Controls.ContextMenu
 local userinputservice
 local Contextmenu = function(instance, parent, content) --content structure example {{Text = "Decompile", Image = "rbxassetid", Func = function}}
