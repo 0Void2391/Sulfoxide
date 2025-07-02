@@ -310,367 +310,360 @@ local function LuaEncode(inputTable, options)
 		end
 
 		TypeCases["number"] = function(value, isKey)
-			-- If the number isn't the current real index of the table, we DO want to
-			-- explicitly define it in the serialization no matter what for accuracy
-			if isKey and value == KeyIndex then
-				-- ^^ What's EXPECTED unless otherwise explicitly defined, if so, return no encoded num
-				KeyIndex = KeyIndex + 1
-				return nil, true
-			end
+            -- If the number isn't the current real index of the table, we DO want to
+            -- explicitly define it in the serialization no matter what for accuracy
+            if isKey and value == KeyNumIndex then
+                -- ^^ What's EXPECTED unless otherwise explicitly defined, if so, return no encoded num
+                KeyNumIndex = KeyNumIndex + 1
+                return nil, true
+            end
 
-			-- Lua's internal `tostring` handling will denote positive/negativie-infinite number TValues as "inf", which
-			-- makes certain numbers not encode properly. We also just want to make the output precise
-			if value == 1/0 then
-				return PositiveInf
-			elseif value == -1/0 then
-				return NegativeInf
-			end
+            -- Lua's internal `tostring` handling will denote positive/negativie-infinite number TValues as "inf", which
+            -- makes certain numbers not encode properly. We also just want to make the output precise
+            if value == 1/0 then
+                return PositiveInf
+            elseif value == -1/0 then
+                return NegativeInf
+            end
 
-			-- Return fixed-formatted precision num
-			return string_format("%.14g", value)
-		end
+            -- Return fixed-formatted precision num
+            return string_format("%.14g", value)
+        end
 
-		TypeCases["string"] = function(value, isKey)
-			if isKey and not LuaKeywords[value] and string_match(value, "^[A-Za-z_][A-Za-z0-9_]*$") then
-				-- ^^ Then it's a syntaxically-correct variable, doesn't need explicit string def
-				return value, true
-			end
+        TypeCases["string"] = function(value, isKey)
+            if isKey and not LuaKeywords[value] and string_match(value, "^[A-Za-z_][A-Za-z0-9_]*$") then
+                -- ^^ Then it's a syntaxically-correct variable, doesn't need explicit string def
+                return value, true
+            end
 
-			return SerializeString(value)
-		end
+            return SerializeString(value)
+        end
 
-		TypeCases["table"] = function(value, isKey)
-			-- Check duplicate/cyclic references
-			do
-				local VisitedTable = VisitedTables[value]
-				if VisitedTable then
-					return string_format(
-						"{--[[LuaEncode: Duplicate reference%s]]}",
-						(value == inputTable and " (of parent)") or ""
-					)
-				end
+        -- This is NOT used for normal table depth, only tables-as-keys and Roblox data types that use tables as
+        -- arguments for constructor functions
+        TypeCases["table"] = function(value, isKey)
+            -- Primarily for tables-as-keys
+            if VisitedTables[value] and OutputWarnings then
+                return "{--[[LuaEncode: Duplicate reference]]}"
+            end
 
-				VisitedTables[value] = true
-			end
+            local NewOptions = setmetatable({}, {__index = options}) do
+                NewOptions.Prettify = (isKey and false) or Prettify
+                NewOptions.IndentCount = (isKey and ((not Prettify and IndentCount) or 1)) or IndentCount
+                NewOptions._StackLevel = (isKey and 1) or StackLevel + 1
+                NewOptions._VisitedTables = VisitedTables
+            end
 
-			-- *Point index not set by NewOptions to original
-			local NewOptions = setmetatable({}, {__index = options}) do
-				-- Overriding if key because it'd look worse pretty printed in a key
-				NewOptions.Prettify = (isKey and false) or Prettify
+            return LuaEncode(value, NewOptions)
+        end
 
-				-- If Prettify is already false in the real args, set the indent to whatever
-				-- the REAL IndentCount is set to
-				NewOptions.IndentCount = (isKey and ((not Prettify and IndentCount) or 1)) or IndentCount
+        TypeCases["boolean"] = function(value)
+            return value and "true" or "false"
+        end
 
-				-- Internal options
-				NewOptions._StackLevel = (isKey and 1) or StackLevel + 1 -- If isKey, stack lvl is set to the **LOWEST** because it's the key to a value
-				NewOptions._VisitedTables = VisitedTables
-			end
+        TypeCases["nil"] = function(value)
+            return "nil"
+        end
 
-			return LuaEncode(value, NewOptions)
-		end
+        TypeCases["function"] = function(value)
+            -- If `FunctionsReturnRaw` is set as true, we'll call the function here itself, expecting
+            -- a raw value for FunctionsReturnRaw to add as the key/value, you may want to do this for custom userdata or
+            -- function closures. Thank's for listening to my Ted Talk!
+            if FunctionsReturnRaw then
+                return value()
+            end
 
-		TypeCases["boolean"] = function(value)
-			return value and "true" or "false"
-		end
+            return string_format(
+                "function()%sreturn end",
+                (OutputWarnings and " --[[LuaEncode: `options.FunctionsReturnRaw` false; can't serialize functions]] ") or ""
+            )
+        end
 
-		TypeCases["nil"] = function(value)
-			return "nil"
-		end
+        ---------- ROBLOX CUSTOM DATA TYPES BELOW ----------
 
-		TypeCases["function"] = function(value)
-			-- If `FunctionsReturnRaw` is set as true, we'll call the function here itself, expecting
-			-- a raw value for FunctionsReturnRaw to add as the key/value, you may want to do this for custom userdata or
-			-- function closures. Thank's for listening to my Ted Talk!
-			if FunctionsReturnRaw then
-				return value()
-			end
+        TypeCases["Axes"] = function(value)
+            local EncodedArgs = {}
+            local EnumValues = {
+                ["Enum.Axis.X"] = value.X,
+                ["Enum.Axis.Y"] = value.Y,
+                ["Enum.Axis.Z"] = value.Z,
+            }
 
-			-- If all else, force key func to return nil; can't handle a func val..
-			return "function() return end"
-		end
+            for EnumValue, IsEnabled in next, EnumValues do
+                if IsEnabled then
+                    EncodedArgs[#EncodedArgs+1] = EnumValue
+                end
+            end
 
-		---------- ROBLOX CUSTOM DATATYPES BELOW ----------
+            return "Axes.new(" .. table_concat(EncodedArgs, ValueSeperator) .. ")"
+        end
 
-		TypeCases["Axes"] = function(value)
-			local EncodedArgs = {}
-			local EnumValues = {
-				["Enum.Axis.X"] = value.X,
-				["Enum.Axis.Y"] = value.Y,
-				["Enum.Axis.Z"] = value.Z,
-			}
+        TypeCases["BrickColor"] = function(value)
+            -- BrickColor.Number (Its enum ID) will be slightly more efficient in all cases in deser,
+            -- so we'll use it if Options.Prettify is false
+            return "BrickColor.new(" ..
+                (Prettify and TypeCase("string", value.Name)) or value.Number ..
+                ")"
+        end
 
-			for EnumValue, IsEnabled in next, EnumValues do
-				if IsEnabled then
-					table_insert(EncodedArgs, EnumValue)
-				end
-			end
+        TypeCases["CFrame"] = function(value)
+            return "CFrame.new(" .. Args(value:components()) .. ")"
+        end
 
-			return "Axes.new(" .. table_concat(EncodedArgs, ValueSeperator) .. ")"
-		end
+        TypeCases["CatalogSearchParams"] = function(value)
+            return Params("CatalogSearchParams.new()", {
+                SearchKeyword = value.SearchKeyword,
+                MinPrice = value.MinPrice,
+                MaxPrice = value.MaxPrice,
+                SortType = value.SortType, -- EnumItem
+                CategoryFilter = value.CategoryFilter, -- EnumItem
+                BundleTypes = value.BundleTypes, -- table
+                AssetTypes = value.AssetTypes -- table
+            })
+        end
 
-		TypeCases["BrickColor"] = function(value)
-			-- BrickColor.Number (Its enum ID) will be slightly more efficient in all cases in deser,
-			-- so we'll use it if Options.Prettify is false
-			return "BrickColor.new(" ..
-				(Prettify and TypeCase("string", value.Name)) or value.Number ..
-				")"
-		end
+        TypeCases["Color3"] = function(value)
+            -- Using floats for RGB values, most accurate for direct serialization
+            return "Color3.new(" .. Args(value.R, value.G, value.B) .. ")"
+        end
 
-		TypeCases["CFrame"] = function(value)
-			return "CFrame.new(" .. Args(value:components()) .. ")"
-		end
+        TypeCases["ColorSequence"] = function(value)
+            return "ColorSequence.new(" .. TypeCase("table", value.Keypoints) .. ")"
+        end
 
-		TypeCases["CatalogSearchParams"] = function(value)
-			return Params("CatalogSearchParams.new()", {
-				SearchKeyword = value.SearchKeyword,
-				MinPrice = value.MinPrice,
-				MaxPrice = value.MaxPrice,
-				SortType = value.SortType, -- EnumItem
-				CategoryFilter = value.CategoryFilter, -- EnumItem
-				BundleTypes = value.BundleTypes, -- table
-				AssetTypes = value.AssetTypes -- table
-			})
-		end
+        TypeCases["ColorSequenceKeypoint"] = function(value)
+            return "ColorSequenceKeypoint.new(" .. Args(value.Time, value.Value) .. ")"
+        end
 
-		TypeCases["Color3"] = function(value)
-			-- Using floats for RGB values, most accurate for direct serialization
-			return "Color3.new(" .. Args(value.R, value.G, value.B)
-		end
+        -- We're using fromUnixTimestamp to serialize the object
+        TypeCases["DateTime"] = function(value)
+            -- Always an int, we don't need to do anything special
+            return "DateTime.fromUnixTimestamp(" .. value.UnixTimestamp .. ")"
+        end
 
-		TypeCases["ColorSequence"] = function(value)
-			return "ColorSequence.new(" .. TypeCase("table", value.Keypoints) .. ")"
-		end
+        -- Properties seem to throw an error on index if the scope isn't a Studio plugin, so we're
+        -- directly getting values! (so fun!!!!)
+        TypeCases["DockWidgetPluginGuiInfo"] = function(value)
+            -- e.g.: "InitialDockState:Right InitialEnabled:0 InitialEnabledShouldOverrideRestore:0 FloatingXSize:0 FloatingYSize:0 MinWidth:0 MinHeight:0"
+            local ValueString = tostring(value)
 
-		TypeCases["ColorSequenceKeypoint"] = function(value)
-			return "ColorSequenceKeypoint.new(" .. Args(value.Time, value.Value) .. ")"
-		end
+            return "DockWidgetPluginGuiInfo.new(" ..
+                Args(
+                    -- InitialDockState (Enum.InitialDockState)
+                    Enum.InitialDockState[string_match(ValueString, "InitialDockState:(%w+)")], -- Enum.InitialDockState.Right
+                    -- InitialEnabled and InitialEnabledShouldOverrideRestore (boolean as number; `0` or `1`)
+                    string_match(ValueString, "InitialEnabled:(%w+)") == "1", -- false
+                    string_match(ValueString, "InitialEnabledShouldOverrideRestore:(%w+)") == "1", -- false
+                    -- FloatingXSize/FloatingYSize (numbers)
+                    tonumber(string_match(ValueString, "FloatingXSize:(%w+)")), -- 0
+                    tonumber(string_match(ValueString, "FloatingYSize:(%w+)")), -- 0
+                    -- MinWidth/MinHeight (numbers)
+                    tonumber(string_match(ValueString, "MinWidth:(%w+)")), -- 0
+                    tonumber(string_match(ValueString, "MinHeight:(%w+)")) -- 0
+                ) ..
+                ")"
+        end
 
-		-- We're using fromUnixTimestamp to serialize the object
-		TypeCases["DateTime"] = function(value)
-			-- Always an int, we don't need to do anything special
-			return "DateTime.fromUnixTimestamp(" .. value.UnixTimestamp .. ")"
-		end
+        -- e.g. `Enum.UserInputType`
+        TypeCases["Enum"] = function(value)
+            return "Enum." .. tostring(value)
+        end
 
-		-- Properties seem to throw an error on index if the scope isn't a Studio plugin, so we're
-		-- directly getting values! (so fun!!!!)
-		TypeCases["DockWidgetPluginGuiInfo"] = function(value)
-			-- e.g.: "InitialDockState:Right InitialEnabled:0 InitialEnabledShouldOverrideRestore:0 FloatingXSize:0 FloatingYSize:0 MinWidth:0 MinHeight:0"
-			local ValueString = tostring(value)
+        -- e.g. `Enum.UserInputType.Gyro`
+        TypeCases["EnumItem"] = function(value)
+            return tostring(value) -- Returns the full enum index for now (e.g. "Enum.UserInputType.Gyro")
+        end
 
-			return "DockWidgetPluginGuiInfo.new(" ..
-				Args(
-					-- InitialDockState (Enum.InitialDockState)
-					Enum.InitialDockState[string_match(ValueString, "InitialDockState:(%w+)")], -- Enum.InitialDockState.Right
-					-- InitialEnabled and InitialEnabledShouldOverrideRestore (boolean as number; `0` or `1`)
-					string_match(ValueString, "InitialEnabled:(%w+)") == "1", -- false
-					string_match(ValueString, "InitialEnabledShouldOverrideRestore:(%w+)") == "1", -- false
-					-- FloatingXSize/FloatingYSize (numbers)
-					tonumber(string_match(ValueString, "FloatingXSize:(%w+)")), -- 0
-					tonumber(string_match(ValueString, "FloatingYSize:(%w+)")), -- 0
-					-- MinWidth/MinHeight (numbers)
-					tonumber(string_match(ValueString, "MinWidth:(%w+)")), -- 0
-					tonumber(string_match(ValueString, "MinHeight:(%w+)")) -- 0
-				) ..
-				")"
-		end
+        -- i.e. the `Enum` global return
+        TypeCases["Enums"] = function(value)
+            return "Enum"
+        end
 
-		-- e.g. `Enum.UserInputType`
-		TypeCases["Enum"] = function(value)
-			return "Enum." .. tostring(value) -- For now, this is the behavior of enums in tostring.. I have no other choice atm
-		end
+        TypeCases["Faces"] = function(value)
+            local EncodedArgs = {}
+            local EnumValues = {
+                ["Enum.NormalId.Top"] = value.Top, -- These return bools
+                ["Enum.NormalId.Bottom"] = value.Bottom,
+                ["Enum.NormalId.Left"] = value.Left,
+                ["Enum.NormalId.Right"] = value.Right,
+                ["Enum.NormalId.Back"] = value.Back,
+                ["Enum.NormalId.Front"] = value.Front,
+            }
 
-		-- e.g. `Enum.UserInputType.Gyro`
-		TypeCases["EnumItem"] = function(value)
-			return tostring(value) -- Returns the full enum index for now (e.g. "Enum.UserInputType.Gyro")
-		end
+            for EnumValue, IsEnabled in next, EnumValues do
+                if IsEnabled then
+                    EncodedArgs[#EncodedArgs+1] = EnumValue
+                end
+            end
 
-		-- i.e. the `Enum` global return
-		TypeCases["Enums"] = function(value)
-			return "Enum"
-		end
+            return "Faces.new(" .. table_concat(EncodedArgs, ValueSeperator) .. ")"
+        end
 
-		TypeCases["Faces"] = function(value)
-			local EncodedArgs = {}
-			local EnumValues = {
-				["Enum.NormalId.Top"] = value.Top, -- These return bools
-				["Enum.NormalId.Bottom"] = value.Bottom,
-				["Enum.NormalId.Left"] = value.Left,
-				["Enum.NormalId.Right"] = value.Right,
-				["Enum.NormalId.Back"] = value.Back,
-				["Enum.NormalId.Front"] = value.Front,
-			}
+        TypeCases["FloatCurveKey"] = function(value)
+            return "FloatCurveKey.new(" .. Args(value.Time, value.Value, value.Interpolation) .. ")"
+        end
 
-			for EnumValue, IsEnabled in next, EnumValues do
-				if IsEnabled then
-					table_insert(EncodedArgs, EnumValue)
-				end
-			end
+        TypeCases["Font"] = function(value)
+            return "Font.new(" .. Args(value.Family, value.Weight, value.Style) .. ")"
+        end
 
-			return "Faces.new(" .. table_concat(EncodedArgs, ValueSeperator) .. ")"
-		end
+        -- Instance refs can be evaluated to their paths (optional), but if parented to
+        -- nil or some DataModel not under `game`, it'll just return nil
+        TypeCases["Instance"] = function(value)
+            if UseInstancePaths then
+                local InstancePath = EvaluateInstancePath(value)
+                if InstancePath then
+                    return InstancePath
+                end
 
-		TypeCases["FloatCurveKey"] = function(value)
-			return "FloatCurveKey.new(" .. Args(value.Time, value.Value, value.Interpolation) .. ")"
-		end
+                -- ^^ Now, if the path isn't accessable, falls back to the return below anyway
+            end
 
-		TypeCases["Font"] = function(value)
-			return "Font.new(" .. Args(value.Family, value.Weight, value.Style) .. ")"
-		end
+            return "nil" .. BlankSeperator .. CommentBlock("Instance.new(" .. TypeCase("string", value.ClassName) .. ")")
+        end
 
-		-- Instance refs can be evaluated to their paths (optional), but if parented to
-		-- nil or some DataModel not under `game`, it'll just return nil
-		TypeCases["Instance"] = function(value)
-			if UseInstancePaths then
-				local InstancePath = EvaluateInstancePath(value)
-				if InstancePath then
-					return InstancePath
-				end
+        TypeCases["NumberRange"] = function(value)
+            return "NumberRange.new(" .. Args(value.Min, value.Max) .. ")"
+        end
 
-				-- ^^ Now, if the path isn't accessable, falls back to the return below anyway
-			end
+        TypeCases["NumberSequence"] = function(value)
+            return "NumberSequence.new(" .. TypeCase("table", value.Keypoints) .. ")"
+        end
 
-			return "nil" .. BlankSeperator .. CommentBlock("Instance.new(" .. TypeCase("string", value.ClassName) .. ")")
-		end
+        TypeCases["NumberSequenceKeypoint"] = function(value)
+            return "NumberSequenceKeypoint.new(" .. Args(value.Time, value.Value, value.Envelope) .. ")"
+        end
 
-		TypeCases["NumberRange"] = function(value)
-			return "NumberRange.new(" .. Args(value.Min, value.Max) .. ")"
-		end
+        TypeCases["OverlapParams"] = function(value)
+            return Params("OverlapParams.new()", {
+                FilterDescendantsInstances = value.FilterDescendantsInstances,
+                FilterType = value.FilterType,
+                MaxParts = value.MaxParts,
+                CollisionGroup = value.CollisionGroup,
+                RespectCanCollide = value.RespectCanCollide
+            })
+        end
 
-		TypeCases["NumberSequence"] = function(value)
-			return "NumberSequence.new(" .. TypeCase("table", value.Keypoints) .. ")"
-		end
+        TypeCases["PathWaypoint"] = function(value)
+            return "PathWaypoint.new(" .. Args(value.Position, value.Action, value.Label) .. ")"
+        end
 
-		TypeCases["NumberSequenceKeypoint"] = function(value)
-			return "NumberSequenceKeypoint.new(" .. Args(value.Time, value.Value, value.Envelope) .. ")"
-		end
+        TypeCases["PhysicalProperties"] = function(value)
+            return "PhysicalProperties.new(" ..
+                Args(
+                    value.Density,
+                    value.Friction,
+                    value.Elasticity,
+                    value.FrictionWeight,
+                    value.ElasticityWeight
+                ) ..
+                ")"
+        end
 
-		TypeCases["OverlapParams"] = function(value)
-			return Params("OverlapParams.new()", {
-				FilterDescendantsInstances = value.FilterDescendantsInstances,
-				FilterType = value.FilterType,
-				MaxParts = value.MaxParts,
-				CollisionGroup = value.CollisionGroup,
-				RespectCanCollide = value.RespectCanCollide
-			})
-		end
+        TypeCases["Random"] = function()
+            return "Random.new()"
+        end
 
-		TypeCases["PathWaypoint"] = function(value)
-			return "PathWaypoint.new(" .. Args(value.Position, value.Action, value.Label) .. ")"
-		end
+        TypeCases["Ray"] = function(value)
+            return "Ray.new(" .. Args(value.Origin, value.Direction) .. ")"
+        end
 
-		TypeCases["PhysicalProperties"] = function(value)
-			return "PhysicalProperties.new(" ..
-				Args(
-					value.Density,
-					value.Friction,
-					value.Elasticity,
-					value.FrictionWeight,
-					value.ElasticityWeight
-				) ..
-				")"
-		end
+        TypeCases["RaycastParams"] = function(value)
+            return Params("RaycastParams.new()", {
+                FilterDescendantsInstances = value.FilterDescendantsInstances,
+                FilterType = value.FilterType,
+                IgnoreWater = value.IgnoreWater,
+                CollisionGroup = value.CollisionGroup,
+                RespectCanCollide = value.RespectCanCollide
+            })
+        end
 
-		TypeCases["Random"] = function()
-			return "Random.new()"
-		end
+        TypeCases["Rect"] = function(value)
+            return "Rect.new(" .. Args(value.Min, value.Max) .. ")"
+        end
 
-		TypeCases["Ray"] = function(value)
-			return "Ray.new(" .. Args(value.Origin, value.Direction) .. ")"
-		end
+        -- Roblox doesn't provide read properties for min/max on `Region3`, but they do on Region3int16.. Anyway,
+        -- we CAN calculate the min/max of a Region3 from just .CFrame and .Size.. Thanks to wally for linking me
+        -- the thread for this method lol
+        TypeCases["Region3"] = function(value)
+            local ValueCFrame = value.CFrame
+            local ValueSize = value.Size
 
-		TypeCases["RaycastParams"] = function(value)
-			return Params("RaycastParams.new()", {
-				FilterDescendantsInstances = value.FilterDescendantsInstances,
-				FilterType = value.FilterType,
-				IgnoreWater = value.IgnoreWater,
-				CollisionGroup = value.CollisionGroup,
-				RespectCanCollide = value.RespectCanCollide
-			})
-		end
+            return "Region3.new(" ..
+                Args(
+                    ValueCFrame * CFrame.new(-ValueSize / 2), -- Minimum
+                    ValueCFrame * CFrame.new(ValueSize / 2) -- Maximum
+                ) ..
+                ")"
+        end
 
-		TypeCases["Rect"] = function(value)
-			return "Rect.new(" .. Args(value.Min, value.Max) .. ")"
-		end
+        TypeCases["Region3int16"] = function(value)
+            return "Region3int16.new(" .. Args(value.Min, value.Max) .. ")"
+        end
 
-		-- Roblox doesn't provide read properties for min/max on `Region3`, but they do on Region3int16.. Anyway,
-		-- we CAN calculate the min/max of a Region3 from just .CFrame and .Size.. Thanks to wally for linking me
-		-- the thread for this method lol
-		TypeCases["Region3"] = function(value)
-			local ValueCFrame = value.CFrame
-			local ValueSize = value.Size
+        TypeCases["TweenInfo"] = function(value)
+            return "TweenInfo.new(" ..
+                Args(
+                    value.Time,
+                    value.EasingStyle,
+                    value.EasingDirection,
+                    value.RepeatCount,
+                    value.Reverses,
+                    value.DelayTime
+                ) ..
+                ")"
+        end
 
-			return "Region3.new(" ..
-				Args(
-					ValueCFrame * CFrame.new(-ValueSize / 2), -- Minimum
-					ValueCFrame * CFrame.new(ValueSize / 2) -- Maximum
-				) ..
-				")"
-		end
+        -- CURRENTLY UNDOCUMENTED*
+        TypeCases["RotationCurveKey"] = function(value)
+            return "RotationCurveKey.new(" .. Args(value.Time, value.Value, value.Interpolation) .. ")"
+        end
 
-		TypeCases["Region3int16"] = function(value)
-			return "Region3int16.new(" .. Args(value.Min, value.Max) .. ")"
-		end
+        TypeCases["UDim"] = function(value)
+            return "UDim.new(" .. Args(value.Scale, value.Offset) .. ")"
+        end
 
-		TypeCases["TweenInfo"] = function(value)
-			return "TweenInfo.new(" ..
-				Args(
-					value.Time,
-					value.EasingStyle,
-					value.EasingDirection,
-					value.RepeatCount,
-					value.Reverses,
-					value.DelayTime
-				) ..
-				")"
-		end
+        TypeCases["UDim2"] = function(value)
+            return "UDim2.new(" ..
+                Args(
+                    -- Not directly using X and Y UDims for better output (i.e. would be
+                    -- UDim2.new(UDim.new(1, 0), UDim.new(1, 0)) if I did)
+                    value.X.Scale,
+                    value.X.Offset,
+                    value.Y.Scale,
+                    value.Y.Offset
+                ) ..
+                ")"
+        end
 
-		-- CURRENTLY UNDOCUMENTED*
-		TypeCases["RotationCurveKey"] = function(value)
-			return "RotationCurveKey.new(" .. Args(value.Time, value.Value, value.Interpolation) .. ")"
-		end
+        TypeCases["Vector2"] = function(value)
+            return "Vector2.new(" .. Args(value.X, value.Y) .. ")"
+        end
 
-		TypeCases["UDim"] = function(value)
-			return "UDim.new(" .. Args(value.Scale, value.Offset) .. ")"
-		end
+        TypeCases["Vector2int16"] = function(value)
+            return "Vector2int16.new(" .. Args(value.X, value.Y) .. ")"
+        end
 
-		TypeCases["UDim2"] = function(value)
-			return "UDim2.new(" ..
-				Args(
-					-- Not directly using X and Y UDims for better output (i.e. would be
-					-- UDim2.new(UDim.new(1, 0), UDim.new(1, 0)) if I did)
-					value.X.Scale,
-					value.X.Offset,
-					value.Y.Scale,
-					value.Y.Offset
-				) ..
-				")"
-		end
+        TypeCases["Vector3"] = function(value)
+            return "Vector3.new(" .. Args(value.X, value.Y, value.Z) .. ")"
+        end
 
-		TypeCases["Vector2"] = function(value)
-			return "Vector2.new(" .. Args(value.X, value.Y) .. ")"
-		end
+        TypeCases["Vector3int16"] = function(value)
+            return "Vector3int16.new(" .. Args(value.X, value.Y, value.Z) .. ")"
+        end
 
-		TypeCases["Vector2int16"] = function(value)
-			return "Vector2int16.new(" .. Args(value.X, value.Y) .. ")"
-		end
-
-		TypeCases["Vector3"] = function(value)
-			return "Vector3.new(" .. Args(value.X, value.Y, value.Z) .. ")"
-		end
-
-		TypeCases["Vector3int16"] = function(value)
-			return "Vector3int16.new(" .. Args(value.X, value.Y, value.Z) .. ")"
-		end
-
-		-- With userdata, just encode directly
-		TypeCases["userdata"] = function(value)
-			if getmetatable(value) then -- Has mt
-				return "newproxy(true)"
-			else
-				return "newproxy()" -- newproxy() defaults to false (no mt)
-			end
-		end
+        TypeCases["buffer"] = function(value)
+            return "buffer.fromstring(" .. SerializeString(buffer.tostring(value)) .. ")"
+        end
+		
+        -- With userdata, just encode directly
+        TypeCases["userdata"] = function(value)
+            if getmetatable(value) ~= nil then -- Has mt
+                return "newproxy(true)"
+            else
+                return "newproxy()" -- newproxy() defaults to false (no mt)
+            end
+        end
 		TypeCases["nil"] = function(value)
 			return "nil"
 		end
