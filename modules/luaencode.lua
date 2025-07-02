@@ -673,7 +673,7 @@ local function LuaEncode(inputTable, options)
         -- Just because of control flow restrictions with Lua compatibility
         local SkipStackPop = false 
 
-        for Key, Value in Pairs(TablePointer)(TablePointer, NextKey) do
+        for Key, Value in Pairs(TablePointer), TablePointer, NextKey do
             local KeyType = Type(Key)
             local ValueType = Type(Value)
 
