@@ -1,7 +1,7 @@
 local Handler = {}
 Handler.__index = Handler
 
-function Handler:IsSupport(Function)
+function Handler:IsSupported(Function)
 	if getgenv()[Function] then
 		return true
 	else
@@ -14,7 +14,7 @@ function Handler:Import(Module, RunMode)
 		return loadstring(
 			game:HttpGet("https://raw.githubusercontent.com/0Void2391/Sulfoxide/refs/heads/main/" .. Module)
 		)()
-	elseif getgenv().settings.runmode == "file" then
+	elseif RunMode == "File" then
 		return loadstring(readfile("Sulfoxide/" .. Module))()
 	end
 end
