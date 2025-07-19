@@ -82,57 +82,59 @@ end
     return old(...)
 end))
 for i,v in pairs(getinstances()) do
-    if v:IsA("BaseRemoteEvent") then
-        --[[hooksignal(v.OnClientEvent,function(info,...)
-            print("hooksignal works")
-            local remote = remoteclass.new(v, "OnClientEvent", {...}, nil, nil)
-            addcall(remote)
-            return true, ...
-        end)]]
-        v.OnClientEvent:Connect(function(...)
-            local method = "OnClientEvent"
-            local caller = checkcaller()
-            if getgenv().loggedremotes.blockedremotes["All"][GetDebugId(v)..method] or (getgenv().loggedremotes.blockedremotes["Args"][(GetDebugId(v))..method] and comparetables(getgenv().loggedremotes.blockedremotes["Args"][(GetDebugId(v))..method].args,args)) then
-                return 
-            elseif getgenv().loggedremotes.ignoredremotes["All"][(GetDebugId(v))..method] or (getgenv().loggedremotes.ignoredremotes["Args"][(GetDebugId(v))..method] and comparetables(getgenv().loggedremotes.ignoredremotes["Args"][(GetDebugId(v))..method].args,args)) or getgenv().iscaller and caller
-                then
-                    return
+    if typeof(v) == Instance then
+        if v:IsA("BaseRemoteEvent") then
+            --[[hooksignal(v.OnClientEvent,function(info,...)
+                print("hooksignal works")
+                local remote = remoteclass.new(v, "OnClientEvent", {...}, nil, nil)
+                addcall(remote)
+                return true, ...
+            end)]]
+            v.OnClientEvent:Connect(function(...)
+                local method = "OnClientEvent"
+                local caller = checkcaller()
+                if getgenv().loggedremotes.blockedremotes["All"][GetDebugId(v)..method] or (getgenv().loggedremotes.blockedremotes["Args"][(GetDebugId(v))..method] and comparetables(getgenv().loggedremotes.blockedremotes["Args"][(GetDebugId(v))..method].args,args)) then
+                    return 
+                elseif getgenv().loggedremotes.ignoredremotes["All"][(GetDebugId(v))..method] or (getgenv().loggedremotes.ignoredremotes["Args"][(GetDebugId(v))..method] and comparetables(getgenv().loggedremotes.ignoredremotes["Args"][(GetDebugId(v))..method].args,args)) or getgenv().iscaller and caller
+                    then
+                        return
+                end
+                local initialargs = {...}
+                local args = createtablewithnil()
+                for i = 1, select("#",...) do
+                    args[i] = initialargs[i]
+                end
+                local remote = remoteclass.new(cloneref(v), method, args, nil, nil, nil)
+                task.spawn(addcall,remote)
+            end)
+        elseif v:IsA("RemoteFunction") then
+            if getcallbackvalue and pcall(getcallbackvalue,v, "OnClientInvoke") then
+            local old; 
+            local _,old = pcall(hookfunction,getcallbackvalue(v, "OnClientInvoke"), newcclosure(function(...)
+                local oldid = getthreadidentity()
+                setthreadidentity(8)
+                local addcall = loadstring(game:HttpGet("https://raw.githubusercontent.com/0Void2391/Sulfoxide/refs/heads/main/ui/modules/Remotespy.lua"))()--upvalue exceeded fix
+                local method = "OnClientInvoke"
+                local caller = checkcaller()
+                local returnedvalue = old(...)
+                local initialargs = {...}
+                local args = createtablewithnil()
+                for i = 1, select("#",...) do
+                    args[i] = initialargs[i]
+                end
+                if getgenv().loggedremotes.blockedremotes["All"][GetDebugId(v)..method] or (getgenv().loggedremotes.blockedremotes["Args"][(GetDebugId(v))..method] and comparetables(getgenv().loggedremotes.blockedremotes["Args"][(GetDebugId(v))..method].args,args)) then
+                    return 
+                elseif getgenv().loggedremotes.ignoredremotes["All"][(GetDebugId(v))..method] or (getgenv().loggedremotes.ignoredremotes["Args"][(GetDebugId(v))..method] and comparetables(getgenv().loggedremotes.ignoredremotes["Args"][(GetDebugId(v))..method].args,args)) or getgenv().iscaller and caller
+                    then
+                        return
+                end
+                local remote = remoteclass.new(cloneref(v), method, args, returnedvalue, nil, nil)
+                task.spawn(addcall,remote)
+                setthreadidentity(oldid)
+                return returnedvalue
+            end))
             end
-            local initialargs = {...}
-            local args = createtablewithnil()
-            for i = 1, select("#",...) do
-                args[i] = initialargs[i]
-            end
-            local remote = remoteclass.new(cloneref(v), method, args, nil, nil, nil)
-            task.spawn(addcall,remote)
-        end)
-    elseif v:IsA("RemoteFunction") then
-        if getcallbackvalue and pcall(getcallbackvalue,v, "OnClientInvoke") then
-        local old; 
-        local _,old = pcall(hookfunction,getcallbackvalue(v, "OnClientInvoke"), newcclosure(function(...)
-            local oldid = getthreadidentity()
-            setthreadidentity(8)
-            local addcall = loadstring(game:HttpGet("https://raw.githubusercontent.com/0Void2391/Sulfoxide/refs/heads/main/ui/modules/Remotespy.lua"))()--upvalue exceeded fix
-            local method = "OnClientInvoke"
-            local caller = checkcaller()
-            local returnedvalue = old(...)
-            local initialargs = {...}
-            local args = createtablewithnil()
-            for i = 1, select("#",...) do
-                args[i] = initialargs[i]
-            end
-            if getgenv().loggedremotes.blockedremotes["All"][GetDebugId(v)..method] or (getgenv().loggedremotes.blockedremotes["Args"][(GetDebugId(v))..method] and comparetables(getgenv().loggedremotes.blockedremotes["Args"][(GetDebugId(v))..method].args,args)) then
-                return 
-            elseif getgenv().loggedremotes.ignoredremotes["All"][(GetDebugId(v))..method] or (getgenv().loggedremotes.ignoredremotes["Args"][(GetDebugId(v))..method] and comparetables(getgenv().loggedremotes.ignoredremotes["Args"][(GetDebugId(v))..method].args,args)) or getgenv().iscaller and caller
-                then
-                    return
-            end
-            local remote = remoteclass.new(cloneref(v), method, args, returnedvalue, nil, nil)
-            task.spawn(addcall,remote)
-            setthreadidentity(oldid)
-            return returnedvalue
-        end))
-        end
+    end
 end
 end
 local fireserver = Instance.new("RemoteEvent").FireServer
