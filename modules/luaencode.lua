@@ -662,7 +662,7 @@ local function LuaEncode(inputTable, options)
         -- Only append an opening brace to the table if this isn't just a continution up the stack
         if IsNewTable then
             Output[#Output+1] = "{"
-        elseif next(TablePointer, NextKey) == nil then -- Formatting for the next entry still needs to be added like any other value
+        elseif Pairs(TablePointer)(TablePointer, NextKey) == nil then -- Formatting for the next entry still needs to be added like any other value
             Output[#Output+1] = NewEntryString .. EndingIndentString
         else
             Output[#Output+1] = ","

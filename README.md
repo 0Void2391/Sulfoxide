@@ -1,6 +1,20 @@
 ## Script
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/0Void2391/Sulfoxide/refs/heads/main/init.lua"))()
+--we're currently changing things in the repo because of the new ui. to run the old version use this:
+if getgenv().ui then warn("already executed!") return end
+getgenv().import = function(module)
+    if getgenv().settings.runmode == "web" then
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/0Void2391/Sulfoxide/6040c9caeddcd1c0fb4a6e944aef1634db5dc1b4/"..module))()
+    elseif getgenv().settings.runmode == "file" then
+        return loadstring(readfile("Sulfoxide/"..module))()
+    end
+end
+getgenv().settings = { --will add more stuff here
+    runmode = "web"
+}
+getgenv().ui, getgenv().customrequire = import("ui/ui.lua")
+import("modules/Remotespy.lua")
+import("ui/modules/Functionscanner.lua")
 ```
 
 # Sulfoxide
