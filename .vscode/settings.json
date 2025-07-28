@@ -1,0 +1,20 @@
+{
+    "luau-lsp.sourcemap.generatorCommand": "newsourcemap",
+    "selene.selenePath": "C:\\Users\\sentr\\OneDrive\\Documents\\GitHub\\Sulfoxide\\.vscode",
+}
+
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/node_modules": true,
+        "**/bower_components": true
+    },
+    "luau-lsp.sourcemap.enabled": true,
+    "luau-lsp.sourcemap.pathFormat": "${dirname} (${filename}.${extname})",
+    "luau-lsp.sourcemap.pathFormatMap": {
+        "**/init.luau": "${dirname} (${filename}.${extname})"
+    },
+    "luau-lsp.completion.imports.enabled": true
+}
