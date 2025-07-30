@@ -1131,26 +1131,15 @@ MenuOverlay_1.BorderSizePixel = 0
 MenuOverlay_1.Size = UDim2.new(1, 0, 1, 0)
 
 --// Init: RemoteSpy
-function Library:LogRemote(Daata)
+function Library:LogRemote(Data)
+	local Methods = {}
+
 	local Model_1 = Handler:CreateInstance("Frame")
 	local UICorner_6 = Handler:CreateInstance("UICorner")
 	local UIStroke_5 = Handler:CreateInstance("UIStroke")
 	local RemoteName_1 = Handler:CreateInstance("TextLabel")
 	local Icon_2 = Handler:CreateInstance("ImageLabel")
 	local CheckLogs_1 = Handler:CreateInstance("TextLabel")
-	local CallList_1 = Handler:CreateInstance("ScrollingFrame")
-	local UIListLayout_3 = Handler:CreateInstance("UIListLayout")
-	local UIPadding_4 = Handler:CreateInstance("UIPadding")
-	local Call_1 = Handler:CreateInstance("Frame")
-	local UICorner_7 = Handler:CreateInstance("UICorner")
-	local UIStroke_6 = Handler:CreateInstance("UIStroke")
-	local CheckArgs_1 = Handler:CreateInstance("TextLabel")
-	local ArgList_1 = Handler:CreateInstance("ScrollingFrame")
-	local Arg_1 = Handler:CreateInstance("Frame")
-	local UICorner_8 = Handler:CreateInstance("UICorner")
-	local CallTitle_1 = Handler:CreateInstance("TextLabel")
-	local UIListLayout_4 = Handler:CreateInstance("UIListLayout")
-	local CallTitle_2 = Handler:CreateInstance("TextLabel")
 
 	Model_1.Name = "Model"
 	Model_1.Parent = Normals_1
@@ -1177,7 +1166,7 @@ function Library:LogRemote(Daata)
 	RemoteName_1.Position = UDim2.new(0.0844899938, 0, 0, 0)
 	RemoteName_1.Size = UDim2.new(0, 200, 0, 52)
 	RemoteName_1.Font = Enum.Font.Unknown
-	RemoteName_1.Text = "Remote name"
+	RemoteName_1.Text = Data.RemoteName or "Remote"
 	RemoteName_1.TextColor3 = Color3.fromRGB(255, 255, 255)
 	RemoteName_1.TextSize = 15
 	RemoteName_1.TextXAlignment = Enum.TextXAlignment.Left
@@ -1208,8 +1197,39 @@ function Library:LogRemote(Daata)
 	CheckLogs_1.TextSize = 15
 	CheckLogs_1.TextXAlignment = Enum.TextXAlignment.Right
 
+	Handler:AddLog("Remote", { RemoteName = Data.RemoteName, Body = Model_1 })
+
+	function Methods:BlockRemote() end
+
+	return Methods
+end
+
+function Library:LogCall(Data)
+	local Remote = Handler.RemoteLogs[Data.RemoteName]
+	local New = Remote or nil
+
+	if not Remote then
+		New = Library:LogRemote({
+			RemoteName = Data.RemoteName,
+		})
+	end
+
+	local CallList_1 = Handler:CreateInstance("ScrollingFrame")
+	local UIListLayout_3 = Handler:CreateInstance("UIListLayout")
+	local UIPadding_4 = Handler:CreateInstance("UIPadding")
+	local Call_1 = Handler:CreateInstance("Frame")
+	local UICorner_7 = Handler:CreateInstance("UICorner")
+	local UIStroke_6 = Handler:CreateInstance("UIStroke")
+	local CheckArgs_1 = Handler:CreateInstance("TextLabel")
+	local ArgList_1 = Handler:CreateInstance("ScrollingFrame")
+	local Arg_1 = Handler:CreateInstance("Frame")
+	local UICorner_8 = Handler:CreateInstance("UICorner")
+	local ArgName = Handler:CreateInstance("TextLabel")
+	local UIListLayout_4 = Handler:CreateInstance("UIListLayout")
+	local CallTitle_2 = Handler:CreateInstance("TextLabel")
+
 	CallList_1.Name = "CallList"
-	CallList_1.Parent = Model_1
+	CallList_1.Parent = New.Body
 	CallList_1.Active = true
 	CallList_1.AnchorPoint = Vector2.new(0.5, 0)
 	CallList_1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1307,19 +1327,20 @@ function Library:LogRemote(Daata)
 	UICorner_8.Parent = Arg_1
 	UICorner_8.CornerRadius = UDim.new(0, 12)
 
-	CallTitle_1.Name = "CallTitle"
-	CallTitle_1.Parent = Arg_1
-	CallTitle_1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	CallTitle_1.BackgroundTransparency = 1
-	CallTitle_1.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	CallTitle_1.BorderSizePixel = 0
-	CallTitle_1.Position = UDim2.new(0.0261028316, 0, 0, 0)
-	CallTitle_1.Size = UDim2.new(0, 200, 0, 40)
-	CallTitle_1.Font = Enum.Font.Unknown
-	CallTitle_1.Text = "Arg1: nil"
-	CallTitle_1.TextColor3 = Color3.fromRGB(220, 220, 220)
-	CallTitle_1.TextSize = 15
-	CallTitle_1.TextXAlignment = Enum.TextXAlignment.Left
+	ArgName.Name = "ArgName"
+	ArgName.Parent = Arg_1
+	ArgName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	ArgName.BackgroundTransparency = 1
+	ArgName.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	ArgName.BorderSizePixel = 0
+	ArgName.Position = UDim2.new(0.0261028316, 0, 0, 0)
+	ArgName.Size = UDim2.new(0, 200, 0, 40)
+	ArgName.Font = Enum.Font.Unknown
+	ArgName.Text = ""
+	ArgName.TextColor3 = Color3.fromRGB(220, 220, 220)
+	ArgName.TextSize = 15
+	ArgName.TextXAlignment = Enum.TextXAlignment.Left
+	ArgName.Visible = false --// this is just a model
 
 	UIListLayout_4.Parent = ArgList_1
 	UIListLayout_4.Padding = UDim.new(0, 5)
@@ -1338,11 +1359,49 @@ function Library:LogRemote(Daata)
 	CallTitle_2.TextColor3 = Color3.fromRGB(255, 255, 255)
 	CallTitle_2.TextSize = 15
 	CallTitle_2.TextXAlignment = Enum.TextXAlignment.Left
+
+	local Index = 1
+
+	if #Data.Args > 0 then
+		for _, v in pairs(Data.Args) do
+			local NewArg = Arg_1:Clone()
+			NewArg.Parent = ArgList_1
+			NewArg.Name = "Arg_" .. Index
+
+			local NewArgName = NewArg.ArgName
+			NewArgName.Text = v.Name or "Argument " .. Index
+
+			Index += 1
+		end
+	end
+
+	Handler:AddLog("Call", {
+		RemoteName = Data.RemoteName,
+		Call = Call_1,
+		Args = Data.Args,
+	})
 end
 
---// On Remote Log
+--// Logs
 Handler.GetBind("LogRemote").Event:Connect(function(Data)
 	Library:LogRemote(Data)
 end)
+
+Handler.GetBind("LogCall").Event:Connect(function(Data)
+	Library:LogCall(Data)
+end)
+
+--// Test
+Handler:GetBind("Remote"):Fire({
+	RemoteName = "TestRemote",
+})
+
+Handler:GetBind("Call"):Fire({
+	RemoteName = "TestRemote",
+	Args = {
+		{ Name = "Arg1", Value = "Value1" },
+		{ Name = "Arg2", Value = "Value2" },
+	},
+})
 
 return Library
