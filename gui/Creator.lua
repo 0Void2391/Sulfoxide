@@ -1,138 +1,137 @@
---// Load Modules [ placeholders ]
-local HandlerModule = nil
-local Modules = nil
+local Creator = {}
 
-local Handler = HandlerModule.new()
-local Library = Handler.Library
+local ContextMenu = import("gui/ContextMenu.lua")
 
-local Revamp = Handler:CreateInstance("ScreenGui")
-local Window_1 = Handler:CreateInstance("Frame")
-local UIStroke_1 = Handler:CreateInstance("UIStroke")
-local TopBar_1 = Handler:CreateInstance("Frame")
-local UICorner_1 = Handler:CreateInstance("UICorner")
-local Corner_1 = Handler:CreateInstance("Frame")
-local Line_1 = Handler:CreateInstance("Frame")
-local Title_1 = Handler:CreateInstance("TextLabel")
-local Subtitle_1 = Handler:CreateInstance("TextLabel")
-local ActionBar_1 = Handler:CreateInstance("Frame")
-local UIListLayout_1 = Handler:CreateInstance("UIListLayout")
-local Close_1 = Handler:CreateInstance("ImageButton")
-local Settings_1 = Handler:CreateInstance("ImageButton")
-local UICorner_2 = Handler:CreateInstance("UICorner")
-local Bar_1 = Handler:CreateInstance("Frame")
-local UICorner_3 = Handler:CreateInstance("UICorner")
-local UIListLayout_2 = Handler:CreateInstance("UIListLayout")
-local RemoteSpy_1 = Handler:CreateInstance("Frame")
-local UICorner_4 = Handler:CreateInstance("UICorner")
-local Icon_1 = Handler:CreateInstance("ImageLabel")
-local Identifier_1 = Handler:CreateInstance("TextLabel")
-local UIPadding_1 = Handler:CreateInstance("UIPadding")
-local UICorner_5 = Handler:CreateInstance("UICorner")
-local UIStroke_2 = Handler:CreateInstance("UIStroke")
-local UIStroke_3 = Handler:CreateInstance("UIStroke")
-local UIPadding_2 = Handler:CreateInstance("UIPadding")
-local UIStroke_4 = Handler:CreateInstance("UIStroke")
-local Container_1 = Handler:CreateInstance("Frame")
-local Rspy_1 = Handler:CreateInstance("ScrollingFrame")
-local UIPadding_3 = Handler:CreateInstance("UIPadding")
-local Normals_1 = Handler:CreateInstance("ScrollingFrame")
-local Line_2 = Handler:CreateInstance("Frame")
-local SearchBar_1 = Handler:CreateInstance("Frame")
-local UICorner_9 = Handler:CreateInstance("UICorner")
-local UIGradient_1 = Handler:CreateInstance("UIGradient")
-local UIStroke_7 = Handler:CreateInstance("UIStroke")
-local SearchIcon_1 = Handler:CreateInstance("ImageLabel")
-local TextBox_1 = Handler:CreateInstance("TextBox")
-local Settings_2 = Handler:CreateInstance("Frame")
-local UICorner_10 = Handler:CreateInstance("UICorner")
-local UIStroke_8 = Handler:CreateInstance("UIStroke")
-local RemoteName_2 = Handler:CreateInstance("TextLabel")
-local ImageButton_1 = Handler:CreateInstance("ImageButton")
-local SearchIcon_2 = Handler:CreateInstance("ImageLabel")
-local UIListLayout_5 = Handler:CreateInstance("UIListLayout")
-local Ignore_1 = Handler:CreateInstance("Frame")
-local UICorner_11 = Handler:CreateInstance("UICorner")
-local UIStroke_9 = Handler:CreateInstance("UIStroke")
-local SearchIcon_3 = Handler:CreateInstance("ImageLabel")
-local RemoteName_3 = Handler:CreateInstance("TextLabel")
-local ImageButton_2 = Handler:CreateInstance("ImageButton")
-local Settings_3 = Handler:CreateInstance("ScrollingFrame")
-local Toggle_1 = Handler:CreateInstance("Frame")
-local UICorner_12 = Handler:CreateInstance("UICorner")
-local UIStroke_10 = Handler:CreateInstance("UIStroke")
-local RemoteName_4 = Handler:CreateInstance("TextLabel")
-local ToggleHolder_1 = Handler:CreateInstance("Frame")
-local Toggle_2 = Handler:CreateInstance("Frame")
-local UICorner_13 = Handler:CreateInstance("UICorner")
-local UIStroke_11 = Handler:CreateInstance("UIStroke")
-local Dot_1 = Handler:CreateInstance("Frame")
-local UICorner_14 = Handler:CreateInstance("UICorner")
-local UIGradient_2 = Handler:CreateInstance("UIGradient")
-local UIListLayout_6 = Handler:CreateInstance("UIListLayout")
-local Button_1 = Handler:CreateInstance("Frame")
-local UICorner_15 = Handler:CreateInstance("UICorner")
-local UIStroke_12 = Handler:CreateInstance("UIStroke")
-local ButtonHolder_1 = Handler:CreateInstance("Frame")
-local CheckLogs_2 = Handler:CreateInstance("TextLabel")
-local ButtonTitle_1 = Handler:CreateInstance("TextLabel")
-local Return_1 = Handler:CreateInstance("Frame")
-local UICorner_16 = Handler:CreateInstance("UICorner")
-local UIStroke_13 = Handler:CreateInstance("UIStroke")
-local RemoteName_5 = Handler:CreateInstance("TextLabel")
-local ImageButton_3 = Handler:CreateInstance("ImageButton")
-local SearchIcon_4 = Handler:CreateInstance("ImageLabel")
-local Line_3 = Handler:CreateInstance("Frame")
-local UIListLayout_7 = Handler:CreateInstance("UIListLayout")
-local Blocked_1 = Handler:CreateInstance("ScrollingFrame")
-local UIListLayout_8 = Handler:CreateInstance("UIListLayout")
-local Model_2 = Handler:CreateInstance("Frame")
-local UICorner_17 = Handler:CreateInstance("UICorner")
-local UIStroke_14 = Handler:CreateInstance("UIStroke")
-local RemoteName_6 = Handler:CreateInstance("TextLabel")
-local Icon_3 = Handler:CreateInstance("ImageLabel")
-local UnblockZone_1 = Handler:CreateInstance("Frame")
-local UICorner_18 = Handler:CreateInstance("UICorner")
-local Name_1 = Handler:CreateInstance("TextLabel")
-local Corner_2 = Handler:CreateInstance("Frame")
-local UICorner_19 = Handler:CreateInstance("UICorner")
-local Line_4 = Handler:CreateInstance("Frame")
-local Return_2 = Handler:CreateInstance("Frame")
-local UICorner_20 = Handler:CreateInstance("UICorner")
-local UIStroke_15 = Handler:CreateInstance("UIStroke")
-local RemoteName_7 = Handler:CreateInstance("TextLabel")
-local ImageButton_4 = Handler:CreateInstance("ImageButton")
-local SearchIcon_5 = Handler:CreateInstance("ImageLabel")
-local Spline_1 = Handler:CreateInstance("Frame")
-local UICorner_21 = Handler:CreateInstance("UICorner")
-local Glow_1 = Handler:CreateInstance("ImageLabel")
-local UIGradient_3 = Handler:CreateInstance("UIGradient")
-local Overlay_1 = Handler:CreateInstance("Frame")
-local UICorner_22 = Handler:CreateInstance("UICorner")
-local Overlay_2 = Handler:CreateInstance("Frame")
-local Panel_1 = Handler:CreateInstance("Frame")
-local Header_1 = Handler:CreateInstance("TextLabel")
-local UICorner_23 = Handler:CreateInstance("UICorner")
-local UIStroke_16 = Handler:CreateInstance("UIStroke")
-local UIPadding_5 = Handler:CreateInstance("UIPadding")
-local Preview_1 = Handler:CreateInstance("Frame")
-local UICorner_24 = Handler:CreateInstance("UICorner")
-local Glow_2 = Handler:CreateInstance("ImageLabel")
-local UIGradient_4 = Handler:CreateInstance("UIGradient")
-local Scroll_1 = Handler:CreateInstance("ScrollingFrame")
-local Editor_1 = Handler:CreateInstance("TextBox")
-local UIListLayout_9 = Handler:CreateInstance("UIListLayout")
-local Frame_1 = Handler:CreateInstance("Frame")
-local UICorner_25 = Handler:CreateInstance("UICorner")
-local ImageLabel_1 = Handler:CreateInstance("ImageLabel")
-local UIStroke_17 = Handler:CreateInstance("UIStroke")
-local Close_2 = Handler:CreateInstance("Frame")
-local UICorner_26 = Handler:CreateInstance("UICorner")
-local ImageLabel_2 = Handler:CreateInstance("ImageLabel")
-local UICorner_27 = Handler:CreateInstance("UICorner")
-local MenuOverlay_1 = Handler:CreateInstance("Frame")
+local Revamp = Instance.new("ScreenGui")
+local Window_1 = Instance.new("Frame")
+local UIStroke_1 = Instance.new("UIStroke")
+local TopBar_1 = Instance.new("Frame")
+local UICorner_1 = Instance.new("UICorner")
+local Corner_1 = Instance.new("Frame")
+local Line_1 = Instance.new("Frame")
+local Title_1 = Instance.new("TextLabel")
+local Subtitle_1 = Instance.new("TextLabel")
+local ActionBar_1 = Instance.new("Frame")
+local UIListLayout_1 = Instance.new("UIListLayout")
+local Close_1 = Instance.new("ImageButton")
+local Settings_1 = Instance.new("ImageButton")
+local UICorner_2 = Instance.new("UICorner")
+local Bar_1 = Instance.new("Frame")
+local UICorner_3 = Instance.new("UICorner")
+local UIListLayout_2 = Instance.new("UIListLayout")
+local RemoteSpy_1 = Instance.new("Frame")
+local UICorner_4 = Instance.new("UICorner")
+local Icon_1 = Instance.new("ImageLabel")
+local Identifier_1 = Instance.new("TextLabel")
+local UIPadding_1 = Instance.new("UIPadding")
+local UICorner_5 = Instance.new("UICorner")
+local UIStroke_2 = Instance.new("UIStroke")
+local UIStroke_3 = Instance.new("UIStroke")
+local UIPadding_2 = Instance.new("UIPadding")
+local UIStroke_4 = Instance.new("UIStroke")
+local Container_1 = Instance.new("Frame")
+local Rspy_1 = Instance.new("ScrollingFrame")
+local UIPadding_3 = Instance.new("UIPadding")
+local Normals_1 = Instance.new("ScrollingFrame")
+local Line_2 = Instance.new("Frame")
+local SearchBar_1 = Instance.new("Frame")
+local UICorner_9 = Instance.new("UICorner")
+local UIGradient_1 = Instance.new("UIGradient")
+local UIStroke_7 = Instance.new("UIStroke")
+local SearchIcon_1 = Instance.new("ImageLabel")
+local TextBox_1 = Instance.new("TextBox")
+local Settings_2 = Instance.new("Frame")
+local UICorner_10 = Instance.new("UICorner")
+local UIStroke_8 = Instance.new("UIStroke")
+local RemoteName_2 = Instance.new("TextLabel")
+local ImageButton_1 = Instance.new("ImageButton")
+local SearchIcon_2 = Instance.new("ImageLabel")
+local UIListLayout_5 = Instance.new("UIListLayout")
+local Ignore_1 = Instance.new("Frame")
+local UICorner_11 = Instance.new("UICorner")
+local UIStroke_9 = Instance.new("UIStroke")
+local SearchIcon_3 = Instance.new("ImageLabel")
+local RemoteName_3 = Instance.new("TextLabel")
+local ImageButton_2 = Instance.new("ImageButton")
+local Settings_3 = Instance.new("ScrollingFrame")
+local Toggle_1 = Instance.new("Frame")
+local UICorner_12 = Instance.new("UICorner")
+local UIStroke_10 = Instance.new("UIStroke")
+local RemoteName_4 = Instance.new("TextLabel")
+local ToggleHolder_1 = Instance.new("Frame")
+local Toggle_2 = Instance.new("Frame")
+local UICorner_13 = Instance.new("UICorner")
+local UIStroke_11 = Instance.new("UIStroke")
+local Dot_1 = Instance.new("Frame")
+local UICorner_14 = Instance.new("UICorner")
+local UIGradient_2 = Instance.new("UIGradient")
+local UIListLayout_6 = Instance.new("UIListLayout")
+local Button_1 = Instance.new("Frame")
+local UICorner_15 = Instance.new("UICorner")
+local UIStroke_12 = Instance.new("UIStroke")
+local ButtonHolder_1 = Instance.new("Frame")
+local CheckLogs_2 = Instance.new("TextLabel")
+local ButtonTitle_1 = Instance.new("TextLabel")
+local Return_1 = Instance.new("Frame")
+local UICorner_16 = Instance.new("UICorner")
+local UIStroke_13 = Instance.new("UIStroke")
+local RemoteName_5 = Instance.new("TextLabel")
+local ImageButton_3 = Instance.new("ImageButton")
+local SearchIcon_4 = Instance.new("ImageLabel")
+local Line_3 = Instance.new("Frame")
+local UIListLayout_7 = Instance.new("UIListLayout")
+local Blocked_1 = Instance.new("ScrollingFrame")
+local UIListLayout_8 = Instance.new("UIListLayout")
+local Model_2 = Instance.new("Frame")
+local UICorner_17 = Instance.new("UICorner")
+local UIStroke_14 = Instance.new("UIStroke")
+local RemoteName_6 = Instance.new("TextLabel")
+local Icon_3 = Instance.new("ImageLabel")
+local UnblockZone_1 = Instance.new("Frame")
+local UICorner_18 = Instance.new("UICorner")
+local Name_1 = Instance.new("TextLabel")
+local Corner_2 = Instance.new("Frame")
+local UICorner_19 = Instance.new("UICorner")
+local Line_4 = Instance.new("Frame")
+local Return_2 = Instance.new("Frame")
+local UICorner_20 = Instance.new("UICorner")
+local UIStroke_15 = Instance.new("UIStroke")
+local RemoteName_7 = Instance.new("TextLabel")
+local ImageButton_4 = Instance.new("ImageButton")
+local SearchIcon_5 = Instance.new("ImageLabel")
+local Spline_1 = Instance.new("Frame")
+local UICorner_21 = Instance.new("UICorner")
+local Glow_1 = Instance.new("ImageLabel")
+local UIGradient_3 = Instance.new("UIGradient")
+local Overlay_1 = Instance.new("Frame")
+local UICorner_22 = Instance.new("UICorner")
+local Overlay_2 = Instance.new("Frame")
+local Panel_1 = Instance.new("Frame")
+local Header_1 = Instance.new("TextLabel")
+local UICorner_23 = Instance.new("UICorner")
+local UIStroke_16 = Instance.new("UIStroke")
+local UIPadding_5 = Instance.new("UIPadding")
+local Preview_1 = Instance.new("Frame")
+local UICorner_24 = Instance.new("UICorner")
+local Glow_2 = Instance.new("ImageLabel")
+local UIGradient_4 = Instance.new("UIGradient")
+local Scroll_1 = Instance.new("ScrollingFrame")
+local Editor_1 = Instance.new("TextBox")
+local UIListLayout_9 = Instance.new("UIListLayout")
+local Frame_1 = Instance.new("Frame")
+local UICorner_25 = Instance.new("UICorner")
+local ImageLabel_1 = Instance.new("ImageLabel")
+local UIStroke_17 = Instance.new("UIStroke")
+local Close_2 = Instance.new("Frame")
+local UICorner_26 = Instance.new("UICorner")
+local ImageLabel_2 = Instance.new("ImageLabel")
+local UICorner_27 = Instance.new("UICorner")
+local MenuOverlay_1 = Instance.new("Frame")
 
 Revamp.Name = "Revamp"
-Revamp.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+Revamp.Parent = gethui and gethui() or game:GetService("CoreGui")
+
+shared.Interface = Revamp
 
 Window_1.Name = "Window"
 Window_1.Parent = Revamp
@@ -1130,16 +1129,13 @@ MenuOverlay_1.BorderColor3 = Color3.fromRGB(0, 0, 0)
 MenuOverlay_1.BorderSizePixel = 0
 MenuOverlay_1.Size = UDim2.new(1, 0, 1, 0)
 
---// Init: RemoteSpy
-function Library:LogRemote(Data)
-	local Methods = {}
-
-	local Model_1 = Handler:CreateInstance("Frame")
-	local UICorner_6 = Handler:CreateInstance("UICorner")
-	local UIStroke_5 = Handler:CreateInstance("UIStroke")
-	local RemoteName_1 = Handler:CreateInstance("TextLabel")
-	local Icon_2 = Handler:CreateInstance("ImageLabel")
-	local CheckLogs_1 = Handler:CreateInstance("TextLabel")
+function Creator:NewRemote(Data)
+	local Model_1 = Instance.new("Frame")
+	local UICorner_6 = Instance.new("UICorner")
+	local UIStroke_5 = Instance.new("UIStroke")
+	local RemoteName_1 = Instance.new("TextLabel")
+	local Icon_2 = Instance.new("ImageLabel")
+	local CheckLogs_1 = Instance.new("TextButton")
 
 	Model_1.Name = "Model"
 	Model_1.Parent = Normals_1
@@ -1197,211 +1193,165 @@ function Library:LogRemote(Data)
 	CheckLogs_1.TextSize = 15
 	CheckLogs_1.TextXAlignment = Enum.TextXAlignment.Right
 
-	Handler:AddLog("Remote", { RemoteName = Data.RemoteName, Body = Model_1 })
+	CheckLogs_1.MouseButton1Click:Connect(function() end)
 
-	function Methods:BlockRemote() end
+	return {
+		AddCall = function(_, Info)
+			local CallList_1 = Instance.new("ScrollingFrame")
+			local UIListLayout_3 = Instance.new("UIListLayout")
+			local UIPadding_4 = Instance.new("UIPadding")
+			local Call_1 = Instance.new("TextButton")
+			local UICorner_7 = Instance.new("UICorner")
+			local UIStroke_6 = Instance.new("UIStroke")
+			local CheckArgs_1 = Instance.new("TextLabel")
+			local ArgList_1 = Instance.new("ScrollingFrame")
+			local Arg_1 = Instance.new("Frame")
+			local UICorner_8 = Instance.new("UICorner")
+			local ArgName = Instance.new("TextLabel")
+			local UIListLayout_4 = Instance.new("UIListLayout")
+			local CallTitle_2 = Instance.new("TextButton")
 
-	return Methods
+			CallList_1.Name = "CallList"
+			CallList_1.Parent = Model_1
+			CallList_1.Active = true
+			CallList_1.AnchorPoint = Vector2.new(0.5, 0)
+			CallList_1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			CallList_1.BackgroundTransparency = 1
+			CallList_1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			CallList_1.BorderSizePixel = 0
+			CallList_1.Position = UDim2.new(0.5, 0, 0.282999992, 0)
+			CallList_1.Size = UDim2.new(0, 522, 0, 122)
+			CallList_1.ClipsDescendants = true
+			CallList_1.AutomaticCanvasSize = Enum.AutomaticSize.Y
+			CallList_1.BottomImage = "rbxasset://textures/ui/Scroll/scroll-bottom.png"
+			CallList_1.CanvasPosition = Vector2.new(0, 0)
+			CallList_1.CanvasSize = UDim2.new(0, 0, 0, 0)
+			CallList_1.ElasticBehavior = Enum.ElasticBehavior.WhenScrollable
+			CallList_1.HorizontalScrollBarInset = Enum.ScrollBarInset.None
+			CallList_1.MidImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
+			CallList_1.ScrollBarImageColor3 = Color3.fromRGB(60, 60, 60)
+			CallList_1.ScrollBarImageTransparency = 0
+			CallList_1.ScrollBarThickness = 3
+			CallList_1.ScrollingDirection = Enum.ScrollingDirection.XY
+			CallList_1.TopImage = "rbxasset://textures/ui/Scroll/scroll-top.png"
+			CallList_1.VerticalScrollBarInset = Enum.ScrollBarInset.None
+			CallList_1.VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right
+
+			UIListLayout_3.Parent = CallList_1
+			UIListLayout_3.Padding = UDim.new(0, 5)
+			UIListLayout_3.HorizontalAlignment = Enum.HorizontalAlignment.Center
+			UIListLayout_3.SortOrder = Enum.SortOrder.LayoutOrder
+
+			UIPadding_4.Parent = CallList_1
+			UIPadding_4.PaddingTop = UDim.new(0, 1)
+
+			Call_1.Name = "Call"
+			Call_1.Parent = CallList_1
+			Call_1.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+			Call_1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Call_1.BorderSizePixel = 0
+			Call_1.Position = UDim2.new(0.0402298868, 0, 0, 0)
+			Call_1.Size = UDim2.new(0, 480, 0, 113)
+			Call_1.Text = ""
+
+			UICorner_7.Parent = Call_1
+			UICorner_7.CornerRadius = UDim.new(0, 15)
+
+			UIStroke_6.Parent = Call_1
+			UIStroke_6.Color = Color3.fromRGB(50, 50, 50)
+			UIStroke_6.Thickness = 1
+			UIStroke_6.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+			CheckArgs_1.Name = "CheckArgs"
+			CheckArgs_1.Parent = Call_1
+			CheckArgs_1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			CheckArgs_1.BackgroundTransparency = 1
+			CheckArgs_1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			CheckArgs_1.BorderSizePixel = 0
+			CheckArgs_1.Position = UDim2.new(0.546929657, 0, 0, 0)
+			CheckArgs_1.Size = UDim2.new(0, 200, 0, 42)
+			CheckArgs_1.Font = Enum.Font.Unknown
+			CheckArgs_1.Text = "Check Args"
+			CheckArgs_1.TextColor3 = Color3.fromRGB(179, 179, 179)
+			CheckArgs_1.TextSize = 15
+			CheckArgs_1.TextXAlignment = Enum.TextXAlignment.Right
+
+			ArgList_1.Name = "ArgList"
+			ArgList_1.Parent = Call_1
+			ArgList_1.Active = true
+			ArgList_1.AnchorPoint = Vector2.new(0.5, 0)
+			ArgList_1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			ArgList_1.BackgroundTransparency = 1
+			ArgList_1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			ArgList_1.BorderSizePixel = 0
+			ArgList_1.Position = UDim2.new(0.5, 0, 0.372353882, 0)
+			ArgList_1.Size = UDim2.new(0, 460, 0, 58)
+			ArgList_1.ClipsDescendants = true
+			ArgList_1.AutomaticCanvasSize = Enum.AutomaticSize.Y
+			ArgList_1.BottomImage = "rbxasset://textures/ui/Scroll/scroll-bottom.png"
+			ArgList_1.CanvasPosition = Vector2.new(0, 0)
+			ArgList_1.CanvasSize = UDim2.new(0, 0, 0, 0)
+			ArgList_1.ElasticBehavior = Enum.ElasticBehavior.WhenScrollable
+			ArgList_1.HorizontalScrollBarInset = Enum.ScrollBarInset.None
+			ArgList_1.MidImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
+			ArgList_1.ScrollBarImageColor3 = Color3.fromRGB(0, 0, 0)
+			ArgList_1.ScrollBarImageTransparency = 0
+			ArgList_1.ScrollBarThickness = 0
+			ArgList_1.ScrollingDirection = Enum.ScrollingDirection.XY
+			ArgList_1.TopImage = "rbxasset://textures/ui/Scroll/scroll-top.png"
+			ArgList_1.VerticalScrollBarInset = Enum.ScrollBarInset.None
+			ArgList_1.VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right
+
+			Arg_1.Name = "Arg"
+			Arg_1.Parent = ArgList_1
+			Arg_1.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+			Arg_1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Arg_1.BorderSizePixel = 0
+			Arg_1.Size = UDim2.new(1, 0, 0, 40)
+
+			UICorner_8.Parent = Arg_1
+			UICorner_8.CornerRadius = UDim.new(0, 12)
+
+			ArgName.Name = "ArgName"
+			ArgName.Parent = Arg_1
+			ArgName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			ArgName.BackgroundTransparency = 1
+			ArgName.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			ArgName.BorderSizePixel = 0
+			ArgName.Position = UDim2.new(0.0261028316, 0, 0, 0)
+			ArgName.Size = UDim2.new(0, 200, 0, 40)
+			ArgName.Font = Enum.Font.Unknown
+			ArgName.Text = ""
+			ArgName.TextColor3 = Color3.fromRGB(220, 220, 220)
+			ArgName.TextSize = 15
+			ArgName.TextXAlignment = Enum.TextXAlignment.Left
+			ArgName.Visible = false
+
+			UIListLayout_4.Parent = ArgList_1
+			UIListLayout_4.Padding = UDim.new(0, 5)
+			UIListLayout_4.SortOrder = Enum.SortOrder.LayoutOrder
+
+			CallTitle_2.Name = "CallTitle"
+			CallTitle_2.Parent = Call_1
+			CallTitle_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			CallTitle_2.BackgroundTransparency = 1
+			CallTitle_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			CallTitle_2.BorderSizePixel = 0
+			CallTitle_2.Position = UDim2.new(0.0261028651, 0, 0, 0)
+			CallTitle_2.Size = UDim2.new(0, 200, 0, 52)
+			CallTitle_2.Font = Enum.Font.Unknown
+			CallTitle_2.Text = "Call"
+			CallTitle_2.TextColor3 = Color3.fromRGB(255, 255, 255)
+			CallTitle_2.TextSize = 15
+			CallTitle_2.TextXAlignment = Enum.TextXAlignment.Left
+
+			ContextMenu({}, Call_1)
+		end,
+	}
 end
 
-function Library:LogCall(Data)
-	local Remote = Handler.RemoteLogs[Data.RemoteName]
-	local New = Remote or nil
+Creator:NewRemote({
+	Name = "Anticheat Remote",
+}):AddCall({})
 
-	if not Remote then
-		New = Library:LogRemote({
-			RemoteName = Data.RemoteName,
-		})
-	end
-
-	local CallList_1 = Handler:CreateInstance("ScrollingFrame")
-	local UIListLayout_3 = Handler:CreateInstance("UIListLayout")
-	local UIPadding_4 = Handler:CreateInstance("UIPadding")
-	local Call_1 = Handler:CreateInstance("Frame")
-	local UICorner_7 = Handler:CreateInstance("UICorner")
-	local UIStroke_6 = Handler:CreateInstance("UIStroke")
-	local CheckArgs_1 = Handler:CreateInstance("TextLabel")
-	local ArgList_1 = Handler:CreateInstance("ScrollingFrame")
-	local Arg_1 = Handler:CreateInstance("Frame")
-	local UICorner_8 = Handler:CreateInstance("UICorner")
-	local ArgName = Handler:CreateInstance("TextLabel")
-	local UIListLayout_4 = Handler:CreateInstance("UIListLayout")
-	local CallTitle_2 = Handler:CreateInstance("TextLabel")
-
-	CallList_1.Name = "CallList"
-	CallList_1.Parent = New.Body
-	CallList_1.Active = true
-	CallList_1.AnchorPoint = Vector2.new(0.5, 0)
-	CallList_1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	CallList_1.BackgroundTransparency = 1
-	CallList_1.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	CallList_1.BorderSizePixel = 0
-	CallList_1.Position = UDim2.new(0.5, 0, 0.282999992, 0)
-	CallList_1.Size = UDim2.new(0, 522, 0, 122)
-	CallList_1.ClipsDescendants = true
-	CallList_1.AutomaticCanvasSize = Enum.AutomaticSize.Y
-	CallList_1.BottomImage = "rbxasset://textures/ui/Scroll/scroll-bottom.png"
-	CallList_1.CanvasPosition = Vector2.new(0, 0)
-	CallList_1.CanvasSize = UDim2.new(0, 0, 0, 0)
-	CallList_1.ElasticBehavior = Enum.ElasticBehavior.WhenScrollable
-	CallList_1.HorizontalScrollBarInset = Enum.ScrollBarInset.None
-	CallList_1.MidImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
-	CallList_1.ScrollBarImageColor3 = Color3.fromRGB(60, 60, 60)
-	CallList_1.ScrollBarImageTransparency = 0
-	CallList_1.ScrollBarThickness = 3
-	CallList_1.ScrollingDirection = Enum.ScrollingDirection.XY
-	CallList_1.TopImage = "rbxasset://textures/ui/Scroll/scroll-top.png"
-	CallList_1.VerticalScrollBarInset = Enum.ScrollBarInset.None
-	CallList_1.VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right
-
-	UIListLayout_3.Parent = CallList_1
-	UIListLayout_3.Padding = UDim.new(0, 5)
-	UIListLayout_3.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	UIListLayout_3.SortOrder = Enum.SortOrder.LayoutOrder
-
-	UIPadding_4.Parent = CallList_1
-	UIPadding_4.PaddingTop = UDim.new(0, 1)
-
-	Call_1.Name = "Call"
-	Call_1.Parent = CallList_1
-	Call_1.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-	Call_1.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Call_1.BorderSizePixel = 0
-	Call_1.Position = UDim2.new(0.0402298868, 0, 0, 0)
-	Call_1.Size = UDim2.new(0, 480, 0, 113)
-
-	UICorner_7.Parent = Call_1
-	UICorner_7.CornerRadius = UDim.new(0, 15)
-
-	UIStroke_6.Parent = Call_1
-	UIStroke_6.Color = Color3.fromRGB(50, 50, 50)
-	UIStroke_6.Thickness = 1
-
-	CheckArgs_1.Name = "CheckArgs"
-	CheckArgs_1.Parent = Call_1
-	CheckArgs_1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	CheckArgs_1.BackgroundTransparency = 1
-	CheckArgs_1.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	CheckArgs_1.BorderSizePixel = 0
-	CheckArgs_1.Position = UDim2.new(0.546929657, 0, 0, 0)
-	CheckArgs_1.Size = UDim2.new(0, 200, 0, 42)
-	CheckArgs_1.Font = Enum.Font.Unknown
-	CheckArgs_1.Text = "Check Args"
-	CheckArgs_1.TextColor3 = Color3.fromRGB(179, 179, 179)
-	CheckArgs_1.TextSize = 15
-	CheckArgs_1.TextXAlignment = Enum.TextXAlignment.Right
-
-	ArgList_1.Name = "ArgList"
-	ArgList_1.Parent = Call_1
-	ArgList_1.Active = true
-	ArgList_1.AnchorPoint = Vector2.new(0.5, 0)
-	ArgList_1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	ArgList_1.BackgroundTransparency = 1
-	ArgList_1.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	ArgList_1.BorderSizePixel = 0
-	ArgList_1.Position = UDim2.new(0.5, 0, 0.372353882, 0)
-	ArgList_1.Size = UDim2.new(0, 460, 0, 58)
-	ArgList_1.ClipsDescendants = true
-	ArgList_1.AutomaticCanvasSize = Enum.AutomaticSize.Y
-	ArgList_1.BottomImage = "rbxasset://textures/ui/Scroll/scroll-bottom.png"
-	ArgList_1.CanvasPosition = Vector2.new(0, 0)
-	ArgList_1.CanvasSize = UDim2.new(0, 0, 0, 0)
-	ArgList_1.ElasticBehavior = Enum.ElasticBehavior.WhenScrollable
-	ArgList_1.HorizontalScrollBarInset = Enum.ScrollBarInset.None
-	ArgList_1.MidImage = "rbxasset://textures/ui/Scroll/scroll-middle.png"
-	ArgList_1.ScrollBarImageColor3 = Color3.fromRGB(0, 0, 0)
-	ArgList_1.ScrollBarImageTransparency = 0
-	ArgList_1.ScrollBarThickness = 0
-	ArgList_1.ScrollingDirection = Enum.ScrollingDirection.XY
-	ArgList_1.TopImage = "rbxasset://textures/ui/Scroll/scroll-top.png"
-	ArgList_1.VerticalScrollBarInset = Enum.ScrollBarInset.None
-	ArgList_1.VerticalScrollBarPosition = Enum.VerticalScrollBarPosition.Right
-
-	Arg_1.Name = "Arg"
-	Arg_1.Parent = ArgList_1
-	Arg_1.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-	Arg_1.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Arg_1.BorderSizePixel = 0
-	Arg_1.Size = UDim2.new(1, 0, 0, 40)
-
-	UICorner_8.Parent = Arg_1
-	UICorner_8.CornerRadius = UDim.new(0, 12)
-
-	ArgName.Name = "ArgName"
-	ArgName.Parent = Arg_1
-	ArgName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	ArgName.BackgroundTransparency = 1
-	ArgName.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	ArgName.BorderSizePixel = 0
-	ArgName.Position = UDim2.new(0.0261028316, 0, 0, 0)
-	ArgName.Size = UDim2.new(0, 200, 0, 40)
-	ArgName.Font = Enum.Font.Unknown
-	ArgName.Text = ""
-	ArgName.TextColor3 = Color3.fromRGB(220, 220, 220)
-	ArgName.TextSize = 15
-	ArgName.TextXAlignment = Enum.TextXAlignment.Left
-	ArgName.Visible = false --// this is just a model
-
-	UIListLayout_4.Parent = ArgList_1
-	UIListLayout_4.Padding = UDim.new(0, 5)
-	UIListLayout_4.SortOrder = Enum.SortOrder.LayoutOrder
-
-	CallTitle_2.Name = "CallTitle"
-	CallTitle_2.Parent = Call_1
-	CallTitle_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	CallTitle_2.BackgroundTransparency = 1
-	CallTitle_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	CallTitle_2.BorderSizePixel = 0
-	CallTitle_2.Position = UDim2.new(0.0261028651, 0, 0, 0)
-	CallTitle_2.Size = UDim2.new(0, 200, 0, 52)
-	CallTitle_2.Font = Enum.Font.Unknown
-	CallTitle_2.Text = "Call"
-	CallTitle_2.TextColor3 = Color3.fromRGB(255, 255, 255)
-	CallTitle_2.TextSize = 15
-	CallTitle_2.TextXAlignment = Enum.TextXAlignment.Left
-
-	local Index = 1
-
-	if #Data.Args > 0 then
-		for _, v in pairs(Data.Args) do
-			local NewArg = Arg_1:Clone()
-			NewArg.Parent = ArgList_1
-			NewArg.Name = "Arg_" .. Index
-
-			local NewArgName = NewArg.ArgName
-			NewArgName.Text = v.Name or "Argument " .. Index
-
-			Index += 1
-		end
-	end
-
-	Handler:AddLog("Call", {
-		RemoteName = Data.RemoteName,
-		Call = Call_1,
-		Args = Data.Args,
-	})
-end
-
---// Logs
-Handler.GetBind("LogRemote").Event:Connect(function(Data)
-	Library:LogRemote(Data)
-end)
-
-Handler.GetBind("LogCall").Event:Connect(function(Data)
-	Library:LogCall(Data)
-end)
-
---// Test
-Handler:GetBind("Remote"):Fire({
-	RemoteName = "TestRemote",
-})
-
-Handler:GetBind("Call"):Fire({
-	RemoteName = "TestRemote",
-	Args = {
-		{ Name = "Arg1", Value = "Value1" },
-		{ Name = "Arg2", Value = "Value2" },
-	},
-})
-
-return Library
+return Creator
